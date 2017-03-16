@@ -11,7 +11,8 @@ select  '' edit,
 		        PC.CODIGO as "CODIGO_CATALOGO",
 	       '' DETAIL,
        '' ERASE,
-decode(nvl(dbms_lob.getlength(pic.arquivo),0),0,null,  '<img '||    'src="'|| apex_util.get_blob_file_src('P62_ARQUIVO',pic.codigo)||    ' " alt="Product Image" title="Imagem do item" />') AS USER_ICON
+       PMC.DESCRICAO as "MOTIVO_OBSERVACAO",
+decode(nvl(dbms_lob.getlength(pic.arquivo),0),0,null,  '<img style=" height:auto;width:auto;max-height:100px;max-width:100px;z-index:5"'||    'src="'|| apex_util.get_blob_file_src('P62_ARQUIVO',pic.codigo)||    ' " alt="Product Image final" title="Imagem do item" />') AS USER_ICON
 
  from	
 		PATRIMONIO_CATALOGO_COMPRA PC ,
@@ -19,14 +20,16 @@ decode(nvl(dbms_lob.getlength(pic.arquivo),0),0,null,  '<img '||    'src="'|| ap
 		PATRIMONIO_HIST_ATEND_BEM PHAB,
 		PATRIMONIO_HIST_ATENDIMENTO PHA, 
 		PATRIMONIO_STATUS_ATEND PSA,
-     patrimonio_imagem_catalogo pic
+     patrimonio_imagem_catalogo pic,
+PATRIMONIO_MOTIVO_CONCLUSAO PMC
 		
 where PBS.CODIGO_ITEM = PC.CODIGO 
 		AND PBS.CODIGO_SOLICITACAO =:P48_CODIGO 
 		AND pbs.codigo = PHAB.CODIGO_BEM_SOLICITADO
 AND	PSA.CODIGO = PHA.CODIGO_ATENDIMENTO 
 AND PHA.CODIGO = PHAB.CODIGO_HIST_ATENDIMENTO
+AND PMC.CODIGO(+) = PHA.CODIGO_MOTIVO_CONCLUSAO
 AND PHAB.codigo IN (SELECT MAX(CODIGO) FROM PATRIMONIO_HIST_ATEND_BEM WHERE codigo_bem_solicitado = pbs.codigo) 
-AND PHA.CODIGO_ATENDIMENTO IN (10,61,11)
+AND PHA.CODIGO_ATENDIMENTO IN (81, 101, 121,20)
 and   pic.CODIGO_ITEM_CATALOGO = pc.codigo
 and   pic.codigo = (select min(p1.codigo) from patrimonio_imagem_catalogo p1 where p1.codigo_item_catalogo = pc.codigo)
